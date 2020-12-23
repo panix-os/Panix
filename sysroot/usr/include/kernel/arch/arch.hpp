@@ -24,6 +24,7 @@ typedef void (*isr_t)(registers_t *);
 // Shared library code for the x86 family
 #include <cpuid.h>
 #include <arch/i386/gdt.hpp>
+#include <arch/i386/tss.hpp>
 #include <arch/i386/idt.hpp>
 #include <arch/i386/isr.hpp>
 #include <arch/i386/timer.hpp>

@@ -13,17 +13,6 @@
 #include <stdint.h>
 
 /**
- * @brief This function is defined in flush.s (assembly) and is
- * used to flush the TSS when we (re)load into the kernel or
- * into userspace. The extern "C" syntax tells the compiler that
- * our function is defined somewhere else and the "C" part tells
- * the compiler to not string mangle our function and to instead
- * look for a literal "tss_flush" function in assembly.
- * 
- */
-extern "C" void tss_flush();
-
-/**
  * @brief The Task State Segment (TSS) is a special data structure for x86 processors 
  * which holds information about a task. The TSS is primarily suited for hardware 
  * multitasking, where each individual process has its own TSS. In Software multitasking, 
@@ -62,3 +51,14 @@ typedef struct tss_entry {
     uint16_t    trap;
     uint16_t    iomap_base;
 } __attribute__ ((packed)) tss_entry_t;
+
+/**
+ * @brief This function is defined in flush.s (assembly) and is
+ * used to flush the TSS when we (re)load into the kernel or
+ * into userspace. The extern "C" syntax tells the compiler that
+ * our function is defined somewhere else and the "C" part tells
+ * the compiler to not string mangle our function and to instead
+ * look for a literal "tss_flush" function in assembly.
+ *
+ */
+extern "C" void tss_flush();

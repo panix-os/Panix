@@ -15,19 +15,45 @@
 #include <lib/stdio.hpp>
 #include <dev/tty/tty.hpp>
 
+#define GDT_NUM_ENTRIES 6
+
 // Defined in the gdt_flush.s file.
 extern "C" void gdt_flush(uintptr_t);
 // Function declarations
+void px_kernel_stack(uintptr_t stack);
+void px_tss_set_gate(int32_t num, uint16_t ss0, uint32_t esp0);
 void px_gdt_set_gate(uint8_t num, uint64_t base, uint64_t limit, uint16_t flags);
 // Define our local variables
-gdt_entry_t gdt_entries[5];
+gdt_entry_t gdt_entries[GDT_NUM_ENTRIES];
 gdt_ptr_t   gdt_ptr;
+tss_entry_t tss_entry;
+
+void px_kernel_stack(uint32_t stack) {
+    // Update TSS kernel stack location
+	tss_entry.esp0 = stack;
+}
+
+void px_tss_set_gate(int32_t num, uint16_t ss0, uint32_t esp0) {
+    // Convert the TSS locations to GDT data
+	uintptr_t base  = (uintptr_t)&tss_entry;
+	uintptr_t limit = base + sizeof(tss_entry);
+
+    // Ensure all values are zero
+	memset(&tss_entry, 0x0, sizeof(tss_entry));
+    // Update specific TSS register values
+	tss_entry.ss0 = ss0;
+	tss_entry.esp0 = esp0;
+	tss_entry.iomap_base = sizeof(tss_entry);
+
+    // Install the TSS in the last GDT location
+    px_gdt_set_gate(num, base, limit, SEG_PRES(1) | SEG_CODE_EXA | SEG_SIZE(1));
+}
 
 void px_gdt_set_gate(uint8_t num, uint64_t base, uint64_t limit, uint16_t flags) {
     // 32-bit address space
     // Now we have to squeeze the (32-bit) limit into 2.5 regiters (20-bit).
     // This is done by discarding the 12 least significant bits, but this
-    // is only legal, if they are all ==1, so they are implicitly still there
+    // is only legal, if they are all == 1, so they are implicitly still there
 
     // so if the last bits aren't all 1, we have to set them to 1, but this
     // would increase the limit (cannot do that, because we might go beyond
@@ -50,10 +76,9 @@ void px_gdt_set_gate(uint8_t num, uint64_t base, uint64_t limit, uint16_t flags)
     memcpy(&gdt_entries[num], &descriptor, sizeof(uint64_t));
 }
 
-//gdt_flush((uintptr_t)gdtp);
 void px_gdt_install() {
     px_kprintf(DBG_INFO "Installing the GDT...\n");
-    gdt_ptr.limit = (sizeof(gdt_entry_t) * 5) - 1;
+    gdt_ptr.limit = sizeof(gdt_entries) - 1;
     gdt_ptr.base  = (uint32_t)&gdt_entries;
 
     px_gdt_set_gate(0, 0, 0, 0);                     // Null segment
@@ -61,7 +86,9 @@ void px_gdt_install() {
     px_gdt_set_gate(2, 0, 0x000FFFFF, GDT_DATA_PL0); // Kernel data segment
     px_gdt_set_gate(3, 0, 0x000FFFFF, GDT_CODE_PL3); // User mode code segment
     px_gdt_set_gate(4, 0, 0x000FFFFF, GDT_DATA_PL3); // User mode data segment
+    px_tss_set_gate(5, 0x10, 0x0);                   // TSS entry
 
     gdt_flush((uint32_t)&gdt_ptr);
+    tss_flush();
     px_kprintf(DBG_OKAY "Installed the GDT.\n");
 }
