@@ -23,14 +23,14 @@ void find_primes(void)
         for (size_t j = prime_current * prime_current; j < PRIME_MAX; j += prime_current) {
             bitmap_clear_bit(primes, j);
         }
-        px_tasks_nano_sleep(1000ULL * 1000 * 100);
+//        px_tasks_nano_sleep(1000ULL * 1000 * 100);
     }
 }
 
 void show_primes(void)
 {
     do {
-        px_tasks_nano_sleep(1000ULL * 1000 * 1000);
+        px_tasks_nano_sleep(1000ULL * 1000);
         size_t pct = (prime_current * 100) / PRIME_MAX_SQRT;
         px_kprintf("\e[s\e[23;0fComputing primes: %%%u\e[u", pct);
     } while (prime_current < PRIME_MAX_SQRT);

@@ -135,8 +135,8 @@ export LDFLAGS :=           \
 # Release build
 # This will be build by default since it
 # is the first target in the Makefile
-release: CXXFLAGS += -O3 -mno-avx
-release: CFLAGS += -O3 -mno-avx
+release: CXXFLAGS += -O3 -mtune=pentium #-mno-avx
+release: CFLAGS += -O3 -mtune=pentium #-mno-avx
 release: $(KERNEL)
 
 # Debug build

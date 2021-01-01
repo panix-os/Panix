@@ -132,6 +132,7 @@ _start.higher:
     # setup and adjust the stack
     movl  $(stack + STACK_SIZE), %esp
 
+/*
     # check if SSE is available
     movl $0x1, %eax
     cpuid
@@ -154,7 +155,7 @@ _start.has_sse:
     movl %cr4, %eax
     orw $(3<<9), %ax # set CR4.OSFXSR and CR4.OSXMMEXCPT at the same time
     movl %eax, %cr4
-
+*/
     # push kernel main parameters
     pushl multiboot_magic               # Multiboot magic number
     pushl multiboot_info                # Multiboot info structure
