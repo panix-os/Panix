@@ -33,7 +33,7 @@ gdt_flush:
 # Allows our code to call tss_flush().
 .global tss_flush
 tss_flush:
-    mov $0x2B, %ax  # Load the index of our TSS structure - The index is
+    mov $0x4B, %ax  # Load the index of our TSS structure - The index is
                     # 0x28, as it is the 5th selector and each is 8 bytes
                     # long, but we set the bottom two bits (making 0x2B)
                     # so that it has an RPL of 3, not zero.

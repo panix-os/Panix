@@ -44,6 +44,7 @@
 #define SEG_CODE_EXRDC       0x0E   // Execute/Read, conforming
 #define SEG_CODE_EXRDCA      0x0F   // Execute/Read, conforming, accessed
 
+// Ring 0 Privilege Levels (Kernel)
 #define GDT_CODE_PL0 SEG_TYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
                      SEG_LONG(0) | SEG_SIZE(1) | SEG_GRAN(1) | \
                      SEG_PRIV(0) | SEG_CODE_EXRD
@@ -52,6 +53,25 @@
                      SEG_LONG(0) | SEG_SIZE(1) | SEG_GRAN(1) | \
                      SEG_PRIV(0) | SEG_DATA_RDWR
 
+// Ring 1 Privilege Levels (Reserved)
+#define GDT_CODE_PL1 SEG_TYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+                     SEG_LONG(0) | SEG_SIZE(1) | SEG_GRAN(1) | \
+                     SEG_PRIV(1) | SEG_CODE_EXRD
+
+#define GDT_DATA_PL1 SEG_TYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+                     SEG_LONG(0) | SEG_SIZE(1) | SEG_GRAN(1) | \
+                     SEG_PRIV(1) | SEG_DATA_RDWR
+
+// Ring 2 Privilege Levels (Reserved for drivers)
+#define GDT_CODE_PL2 SEG_TYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+                     SEG_LONG(0) | SEG_SIZE(1) | SEG_GRAN(1) | \
+                     SEG_PRIV(2) | SEG_CODE_EXRD
+
+#define GDT_DATA_PL2 SEG_TYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
+                     SEG_LONG(0) | SEG_SIZE(1) | SEG_GRAN(1) | \
+                     SEG_PRIV(2) | SEG_DATA_RDWR
+
+// Ring 3 Privilege Levels (Userspace)
 #define GDT_CODE_PL3 SEG_TYPE(1) | SEG_PRES(1) | SEG_SAVL(0) | \
                      SEG_LONG(0) | SEG_SIZE(1) | SEG_GRAN(1) | \
                      SEG_PRIV(3) | SEG_CODE_EXRD

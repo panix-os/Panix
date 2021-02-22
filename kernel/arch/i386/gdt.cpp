@@ -15,7 +15,7 @@
 #include <lib/stdio.hpp>
 #include <dev/tty/tty.hpp>
 
-#define GDT_NUM_ENTRIES 6
+#define GDT_NUM_ENTRIES 10
 
 // Defined in the gdt_flush.s file.
 extern "C" void gdt_flush(uintptr_t);
@@ -84,9 +84,13 @@ void px_gdt_install() {
     px_gdt_set_gate(0, 0, 0, 0);                     // Null segment
     px_gdt_set_gate(1, 0, 0x000FFFFF, GDT_CODE_PL0); // Kernel code segment
     px_gdt_set_gate(2, 0, 0x000FFFFF, GDT_DATA_PL0); // Kernel data segment
-    px_gdt_set_gate(3, 0, 0x000FFFFF, GDT_CODE_PL3); // User mode code segment
-    px_gdt_set_gate(4, 0, 0x000FFFFF, GDT_DATA_PL3); // User mode data segment
-    px_tss_set_gate(5, 0x10, 0x0);                   // TSS entry
+    px_gdt_set_gate(3, 0, 0x000FFFFF, GDT_CODE_PL1); // Reserved code segment
+    px_gdt_set_gate(4, 0, 0x000FFFFF, GDT_DATA_PL1); // Reserved data segment
+    px_gdt_set_gate(5, 0, 0x000FFFFF, GDT_CODE_PL2); // Driver code segment
+    px_gdt_set_gate(6, 0, 0x000FFFFF, GDT_DATA_PL2); // Driver data segment
+    px_gdt_set_gate(7, 0, 0x000FFFFF, GDT_CODE_PL3); // User mode code segment
+    px_gdt_set_gate(8, 0, 0x000FFFFF, GDT_DATA_PL3); // User mode data segment
+    px_tss_set_gate(9, 0x10, 0x0);                   // TSS entry
 
     gdt_flush((uint32_t)&gdt_ptr);
     tss_flush();
